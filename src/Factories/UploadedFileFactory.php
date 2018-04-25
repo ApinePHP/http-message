@@ -21,10 +21,8 @@ class UploadedFileFactory
 {
     /**
      * Create a new uploaded file.
-     *
      * If a string is used to create the file, a temporary resource will be
      * created with the content of the string.
-     *
      * If a size is not provided it will be determined by checking the size of
      * the file.
      *
@@ -32,13 +30,12 @@ class UploadedFileFactory
      * @see http://php.net/manual/features.file-upload.errors.php
      *
      * @param string|resource $file
-     * @param int $size in bytes
-     * @param int $error PHP file upload error
-     * @param string $clientFilename
-     * @param string $clientMediaType
+     * @param int             $size in bytes
+     * @param int             $error PHP file upload error
+     * @param string          $clientFilename
+     * @param string          $clientMediaType
      *
      * @return UploadedFileInterface
-     *
      * @throws \InvalidArgumentException
      *  If the file resource is not readable.
      */
@@ -48,8 +45,7 @@ class UploadedFileFactory
         $error = \UPLOAD_ERR_OK,
         $clientFilename = null,
         $clientMediaType = null
-    ) : UploadedFileInterface
-    {
+    ): UploadedFileInterface {
         return new UploadedFile(
             $file,
             $size,
@@ -64,7 +60,7 @@ class UploadedFileFactory
      *
      * @return UploadedFileInterface[]
      */
-    public function createUploadedFileFromArray(array $files) : array
+    public function createUploadedFileFromArray(array $files): array
     {
         $normalized = [];
         $uploadedFiles = [];
@@ -88,8 +84,8 @@ class UploadedFileFactory
         foreach ($normalized as $info) {
             $uploadedFiles[] = $this->createUploadedFile(
                 $info['tmp_name'],
-                (int) $info['size'],
-                (int) $info['error'],
+                (int)$info['size'],
+                (int)$info['error'],
                 $info['name'],
                 $info['type']
             );

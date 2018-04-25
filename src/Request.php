@@ -45,22 +45,21 @@ class Request extends Message implements ServerRequestInterface
     /**
      * Request constructor.
      *
-     * @param string        $method
-     * @param string|Uri    $uri
-     * @param array         $headers
-     * @param null          $body
-     * @param string        $protocol
-     * @param array         $serverParams
+     * @param string     $method
+     * @param string|Uri $uri
+     * @param array      $headers
+     * @param null       $body
+     * @param string     $protocol
+     * @param array      $serverParams
      */
-    public function __construct (
-        string  $method,
+    public function __construct(
+        string $method,
         $uri,
-        array   $headers = [],
+        array $headers = [],
         $body = null,
-        string  $protocol = '1.1',
+        string $protocol = '1.1',
         array $serverParams = []
-    )
-    {
+    ) {
         if (!($uri instanceof UriInterface)) {
             $uri = new Uri($uri);
         }
@@ -104,7 +103,7 @@ class Request extends Message implements ServerRequestInterface
             }
             
             if ($this->uri->getQuery() != "") {
-                $target.= "?" . $this->uri->getQuery();
+                $target .= "?" . $this->uri->getQuery();
             }
             
             $this->requestTarget = $target;
@@ -138,6 +137,7 @@ class Request extends Message implements ServerRequestInterface
         
         $newRequest = clone $this;
         $newRequest->requestTarget = $requestTarget;
+        
         return $newRequest;
     }
     
@@ -169,6 +169,7 @@ class Request extends Message implements ServerRequestInterface
     {
         $newRequest = clone $this;
         $newRequest->method = strtoupper($method);
+        
         return $newRequest;
     }
     
@@ -270,6 +271,7 @@ class Request extends Message implements ServerRequestInterface
     {
         $new = clone $this;
         $new->cookieParams = $cookies;
+        
         return $new;
     }
     
@@ -312,6 +314,7 @@ class Request extends Message implements ServerRequestInterface
     {
         $new = clone $this;
         $new->queryParams = $query;
+        
         return $new;
     }
     
@@ -345,6 +348,7 @@ class Request extends Message implements ServerRequestInterface
     {
         $new = clone $this;
         $new->uploadedFiles = $uploadedFiles;
+        
         return $new;
     }
     
@@ -394,6 +398,7 @@ class Request extends Message implements ServerRequestInterface
     {
         $new = clone $this;
         $new->parsedBody = $data;
+        
         return $new;
     }
     
@@ -455,6 +460,7 @@ class Request extends Message implements ServerRequestInterface
     {
         $new = clone $this;
         $new->attributes[$name] = $value;
+        
         return $new;
     }
     
@@ -476,6 +482,7 @@ class Request extends Message implements ServerRequestInterface
     {
         $new = clone $this;
         unset($new->attributes[$name]);
+        
         return $new;
     }
     
@@ -484,7 +491,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return boolean
      */
-    public function isHttps() : bool
+    public function isHttps(): bool
     {
         return ($this->hasHeader('HTTPS'));
     }
@@ -494,7 +501,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return boolean
      */
-    public function isAjax() : bool
+    public function isAjax(): bool
     {
         return ($this->hasHeader('X-Requested-With') && $this->getHeaderLine('X-Requested-With') == 'XMLHttpRequest');
     }
@@ -504,7 +511,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return boolean
      */
-    public function isGet() : bool
+    public function isGet(): bool
     {
         return ($this->getMethod() == "GET");
     }
@@ -514,7 +521,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return boolean
      */
-    public function isPost() : bool
+    public function isPost(): bool
     {
         return ($this->getMethod() == "POST");
     }
@@ -524,7 +531,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return boolean
      */
-    public function isPut() : bool
+    public function isPut(): bool
     {
         return ($this->getMethod() == "PUT");
     }
@@ -577,16 +584,16 @@ class Request extends Message implements ServerRequestInterface
         ) {
             $host .= ':' . $this->uri->getPort();
         }
-    
+        
         if (isset($this->headers['host'])) {
             $this->headers['host'] = [
-                "name" => "Host",
+                "name"  => "Host",
                 "value" => [$host]
             ];
         } else {
             $headers = [
                 "host" => [
-                    "name" => "Host",
+                    "name"  => "Host",
                     "value" => [$host]
                 ]
             ];
@@ -600,7 +607,7 @@ class Request extends Message implements ServerRequestInterface
         
         if ($scheme === 'https' && !isset($this->headers['https'])) {
             $this->headers['https'] = [
-                "name" => "Https",
+                "name"  => "Https",
                 "value" => ['HTTPS']
             ];
         }

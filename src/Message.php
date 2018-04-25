@@ -57,6 +57,7 @@ abstract class Message implements MessageInterface
     {
         $newMessage = clone $this;
         $newMessage->protocol = $version;
+        
         return $newMessage;
     }
     
@@ -173,15 +174,12 @@ abstract class Message implements MessageInterface
     public function withHeader($name, $value)
     {
         $newMessage = clone $this;
-    
-        /*if (!is_array($value)) {
-            $value = [$value];
-        }*/
         
         $newMessage->headers[strtolower($name)] = [
-            'name' => $name,
+            'name'  => $name,
             'value' => $value
         ];
+        
         return $newMessage;
     }
     
@@ -204,18 +202,17 @@ abstract class Message implements MessageInterface
     {
         $newMessage = clone $this;
         $sanitizedName = strtolower($name);
-    
+        
         if (isset($newMessage->headers[$sanitizedName])) {
             if (is_string($newMessage->headers[$sanitizedName]['value'])) {
                 $old_value = $newMessage->headers[$sanitizedName]['value'];
                 $newMessage->headers[$sanitizedName]['value'] = [$old_value];
             }
-        
-            //array_push($newMessage->headers[$sanitizedName]['value'], $value);
+            
             if (!is_array($value)) {
                 $value = [$value];
             }
-    
+            
             $newMessage->headers[$sanitizedName]['value'] = array_merge(
                 $newMessage->headers[$sanitizedName]['value'],
                 $value
@@ -226,7 +223,7 @@ abstract class Message implements MessageInterface
                 'value' => $value
             ];
         }
-    
+        
         return $newMessage;
     }
     
@@ -283,6 +280,7 @@ abstract class Message implements MessageInterface
     {
         $newMessage = clone $this;
         $newMessage->body = $body;
+        
         return $newMessage;
     }
     
@@ -332,8 +330,8 @@ abstract class Message implements MessageInterface
             $sanitizedName = strtolower($header);
             
             $this->headers[$sanitizedName] = [
-                    'name' => $header,
-                    'value' => $value
+                'name'  => $header,
+                'value' => $value
             ];
         }
     }

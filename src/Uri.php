@@ -305,8 +305,10 @@ class Uri implements UriInterface
     {
         if (!is_string($host) || empty($host)) {
             $host = '';
-        } else if ($host !== '' && !$this->validateHost($host)) {
-            throw new \InvalidArgumentException(sprintf("Invalid Hostname %s",$host));
+        } else {
+            if ($host !== '' && !$this->validateHost($host)) {
+                throw new \InvalidArgumentException(sprintf("Invalid Hostname %s", $host));
+            }
         }
         
         if ($host === $this->host) {
@@ -533,12 +535,10 @@ class Uri implements UriInterface
     
     /**
      * Validates the format of a host name
-     *
      * A host name can be either an IP address or a domain name. It
      * is a string of no more than 255 bytes (ASCII characters) divided in domain labels
      * of no more than 63 bytes separated by by ".". Parts may start with either a digit of a letter.
      * The only characters allowed in the labels are alphanumerics plus "-".
-     *
      * The syntax allows percent-encoded octets in order to represent non-ASCII characters.
      *
      * @param string $host

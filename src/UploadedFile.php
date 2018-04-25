@@ -31,11 +31,16 @@ class UploadedFile implements UploadedFileInterface
     private $error;
     
     private $moved = false;
-
+    
     private $size;
     
-    public function __construct($resource, int $size, int $errorStatus = UPLOAD_ERR_OK, $clientFilename = null, $clientMediaType = null)
-    {
+    public function __construct(
+        $resource,
+        int $size,
+        int $errorStatus = UPLOAD_ERR_OK,
+        $clientFilename = null,
+        $clientMediaType = null
+    ) {
         $this->size = $size;
         $this->error = $errorStatus;
         $this->setClientFilename($clientFilename);
@@ -44,12 +49,16 @@ class UploadedFile implements UploadedFileInterface
         if ($this->isValid()) {
             if (is_string($resource)) {
                 $this->file = $resource;
-            } else if (is_resource($resource)) {
-                $this->stream = new Stream($resource);
-            } else if ($resource instanceof StreamInterface) {
-                $this->stream = $resource;
             } else {
-                throw new \InvalidArgumentException("Invalid resource provided");
+                if (is_resource($resource)) {
+                    $this->stream = new Stream($resource);
+                } else {
+                    if ($resource instanceof StreamInterface) {
+                        $this->stream = $resource;
+                    } else {
+                        throw new \InvalidArgumentException("Invalid resource provided");
+                    }
+                }
             }
         }
     }
@@ -68,16 +77,16 @@ class UploadedFile implements UploadedFileInterface
         if (false === in_array(gettype($mediaType), ['string', 'NULL'])) {
             throw new \InvalidArgumentException("Uploaded file media type must be string");
         }
-    
+        
         $this->clientMediaType = $mediaType;
     }
     
-    private function isValid () : bool
+    private function isValid(): bool
     {
         return ($this->error === UPLOAD_ERR_OK);
     }
     
-    private function isMoved () : bool
+    private function isMoved(): bool
     {
         return ($this->moved === true);
     }
@@ -96,7 +105,7 @@ class UploadedFile implements UploadedFileInterface
      * @throws \RuntimeException in cases when no stream is available or can be
      *     created.
      */
-    public function getStream() : StreamInterface
+    public function getStream(): StreamInterface
     {
         if (!$this->isValid()) {
             throw new \RuntimeException("Cannot retrieve stream due to upload error");
@@ -154,7 +163,7 @@ class UploadedFile implements UploadedFileInterface
         try {
             if ($this->stream) {
                 $newfile = new Stream(fopen($targetPath, 'w'));
-    
+                
                 while (!$this->stream->eof()) {
                     if (!$newfile->write($this->stream->read(8192))) {
                         break;
@@ -170,7 +179,7 @@ class UploadedFile implements UploadedFileInterface
         } catch (\Throwable $e) {
             throw new \RuntimeException(sprintf("File %1s could not be moved to %2s", $this->file, $targetPath));
         }
-    
+        
         $this->moved = true;
     }
     

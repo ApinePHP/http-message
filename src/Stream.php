@@ -58,8 +58,22 @@ class Stream implements StreamInterface
      * @var array
      */
     private $readableModes = [
-        'r', 'r+', 'w+', 'a+', 'x+', 'c+', 'rb', 'w+b', 'r+b',
-        'x+b', 'c+b', 'rt', 'w+t', 'r+t', 'x+t', 'c+t'
+        'r',
+        'r+',
+        'w+',
+        'a+',
+        'x+',
+        'c+',
+        'rb',
+        'w+b',
+        'r+b',
+        'x+b',
+        'c+b',
+        'rt',
+        'w+t',
+        'r+t',
+        'x+t',
+        'c+t'
     ];
     
     /**
@@ -69,8 +83,23 @@ class Stream implements StreamInterface
      * @var array
      */
     private $writableModes = [
-        'w', 'w+', 'rw', 'r+', 'x+', 'c+', 'wb', 'w+b', 'r+b',
-        'x+b', 'c+b', 'w+t', 'r+t', 'x+t', 'c+t', 'a', 'a+'
+        'w',
+        'w+',
+        'rw',
+        'r+',
+        'x+',
+        'c+',
+        'wb',
+        'w+b',
+        'r+b',
+        'x+b',
+        'c+b',
+        'w+t',
+        'r+t',
+        'x+t',
+        'c+t',
+        'a',
+        'a+'
     ];
     
     /**
@@ -80,7 +109,8 @@ class Stream implements StreamInterface
      *
      * @throws \InvalidArgumentException If the stream source is not a resource
      */
-    public function __construct($streamSource) {
+    public function __construct($streamSource)
+    {
         
         if (!is_resource($streamSource)) {
             throw new \InvalidArgumentException('Stream source is not a resource');
@@ -114,9 +144,10 @@ class Stream implements StreamInterface
      * @see http://php.net/manual/en/language.oop5.magic.php#object.tostring
      * @return string
      */
-    public function __toString() : string
+    public function __toString(): string
     {
         $this->rewind();
+        
         return $this->getContents();
     }
     
@@ -173,7 +204,7 @@ class Stream implements StreamInterface
             $stats = fstat($this->stream);
             
             if (isset($stats['size'])) {
-                $this->size = (int) $stats['size'];
+                $this->size = (int)$stats['size'];
             }
         }
         
@@ -186,14 +217,14 @@ class Stream implements StreamInterface
      * @return int Position of the file pointer
      * @throws \RuntimeException on error.
      */
-    public function tell() : int
+    public function tell(): int
     {
         if (!isset($this->stream)) {
             throw new \RuntimeException('Stream is detached');
         }
-    
+        
         $position = ftell($this->stream);
-    
+        
         if ($position === false) {
             throw new \RuntimeException('Cannot read to position of read/write pointer');
         }
@@ -245,13 +276,14 @@ class Stream implements StreamInterface
         if (!isset($this->stream)) {
             throw new \RuntimeException('Stream is detached');
         }
-    
+        
         if (!$this->isSeekable()) {
             throw new \RuntimeException('Stream is not seekable');
         }
         
         if (fseek($this->stream, $offset, $whence) === -1) {
-            throw new \RuntimeException('Cannot seek to position ' . $offset . ' with whence ' . var_export($whence, true));
+            throw new \RuntimeException('Cannot seek to position ' . $offset . ' with whence ' . var_export($whence,
+                    true));
         }
     }
     
@@ -280,7 +312,7 @@ class Stream implements StreamInterface
         $writable = false;
         
         foreach ($this->writableModes as $mode) {
-            if($mode === $this->meta['mode']) {
+            if ($mode === $this->meta['mode']) {
                 $writable = true;
                 break;
             }
@@ -303,7 +335,7 @@ class Stream implements StreamInterface
         if (!isset($this->stream)) {
             throw new \RuntimeException('Stream is detached');
         }
-    
+        
         if (!$this->isWritable()) {
             throw new \RuntimeException('Stream is not writable');
         }
@@ -359,7 +391,7 @@ class Stream implements StreamInterface
         if (!isset($this->stream)) {
             throw new \RuntimeException('Stream is detached');
         }
-    
+        
         if (!$this->isReadable()) {
             throw new \RuntimeException('Stream is not readable');
         }
@@ -367,7 +399,7 @@ class Stream implements StreamInterface
         if (!is_integer($length)) {
             throw new \InvalidArgumentException('Length is not an integer');
         }
-    
+        
         if ($length < 0) {
             throw new \InvalidArgumentException('Length cannot be negative');
         }

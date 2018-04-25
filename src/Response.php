@@ -109,7 +109,7 @@ class Response extends Message implements ResponseInterface
         if ((empty($reason) || is_null($reason)) && isset(self::$statusCodes[$this->statusCode])) {
             $this->reasonPhrase = self::$statusCodes[$this->statusCode];
         } else {
-            $this->reasonPhrase = (string) $reason;
+            $this->reasonPhrase = (string)$reason;
         }
     }
     
@@ -153,7 +153,7 @@ class Response extends Message implements ResponseInterface
             throw new \InvalidArgumentException('Invalid HTTP status code');
         }
         
-        $newResponse->statusCode = (int) $code;
+        $newResponse->statusCode = (int)$code;
         
         if (empty($reasonPhrase) && isset(self::$statusCodes[$code])) {
             $reasonPhrase = self::$statusCodes[$code];
@@ -163,7 +163,8 @@ class Response extends Message implements ResponseInterface
             throw new \InvalidArgumentException('A reason phrase must be supplied for this status code');
         }
         
-        $newResponse->reasonPhrase = (string) $reasonPhrase;
+        $newResponse->reasonPhrase = (string)$reasonPhrase;
+        
         return $newResponse;
     }
     

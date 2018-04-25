@@ -21,14 +21,13 @@ class StreamFactory
 {
     /**
      * Create a new stream from a string.
-     *
      * The stream SHOULD be created with a temporary resource.
      *
      * @param string $content
      *
      * @return StreamInterface
      */
-    public function createStream(string $content = '') : StreamInterface
+    public function createStream(string $content = ''): StreamInterface
     {
         $resource = fopen('php://temp', 'r+');
         fwrite($resource, $content);
@@ -38,10 +37,8 @@ class StreamFactory
     
     /**
      * Create a stream from an existing file.
-     *
      * The file MUST be opened using the given mode, which may be any mode
      * supported by the `fopen` function.
-     *
      * The `$filename` MAY be any string supported by `fopen()`.
      *
      * @param string $filename
@@ -49,7 +46,7 @@ class StreamFactory
      *
      * @return StreamInterface
      */
-    public function createStreamFromFile($filename, $mode = 'r') : StreamInterface
+    public function createStreamFromFile($filename, $mode = 'r'): StreamInterface
     {
         if (!file_exists($filename)) {
             throw new \InvalidArgumentException('File not found');
@@ -62,14 +59,13 @@ class StreamFactory
     
     /**
      * Create a new stream from an existing resource.
-     *
      * The stream MUST be readable and may be writable.
      *
      * @param resource $resource
      *
      * @return StreamInterface
      */
-    public function createStreamFromResource($resource) : StreamInterface
+    public function createStreamFromResource($resource): StreamInterface
     {
         return new Stream($resource);
     }
