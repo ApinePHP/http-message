@@ -7,6 +7,8 @@
  */
 declare(strict_types=1);
 
+/** @noinspection PhpParamsInspection */
+/** @noinspection PhpUnusedLocalVariableInspection */
 
 use Apine\Http\Stream;
 use PHPUnit\Framework\TestCase;
@@ -25,7 +27,6 @@ class StreamTest extends TestCase
     {
         $filename = dirname(__FILE__) . DIRECTORY_SEPARATOR . 'UriTest.php';
         $resource = fopen($filename,'r');
-        //fwrite($fakeresource, 'Test of PSR-7 Streams');
     
         return new Stream($resource);
     }

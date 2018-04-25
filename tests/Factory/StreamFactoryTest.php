@@ -7,6 +7,7 @@
  */
 declare(strict_types=1);
 
+/** @noinspection PhpUnusedLocalVariableInspection */
 
 use Apine\Http\Factories\StreamFactory;
 use PHPUnit\Framework\TestCase;

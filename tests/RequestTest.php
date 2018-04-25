@@ -7,142 +7,219 @@
  */
 declare(strict_types=1);
 
+/** @noinspection PhpUnusedLocalVariableInspection */
 
 use Apine\Http\Request;
 use Apine\Http\UploadedFile;
 use Apine\Http\Uri;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\StreamInterface;
+use Psr\Http\Message\UriInterface;
 
 class RequestTest extends TestCase
 {
     
-    private function requestFactory() : Request
+    public function testConstructor() : Request
     {
         $uri = new Uri('http://example.com/test/23?test=123');
-        return new Request(
+        $request = new Request(
             'GET',
-            $uri,
+            $uri
+        );
+        
+        $this->assertAttributeEquals('GET', 'method', $request);
+        $this->assertAttributeInstanceOf(UriInterface::class, 'uri', $request);
+        $this->assertAttributeInstanceOf(StreamInterface::class, 'body', $request);
+        $this->assertArrayHasKey('host', $this->getObjectAttribute($request, 'headers'));
+        
+        return $request;
+    }
+    
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Invalid resource type: object
+     */
+    public function testConstructorInvalidBody()
+    {
+        $request = new Request(
+            'GET',
+            'https://example.com',
             [],
-            null,
-            '1,1',
-            $_SERVER
+            new Uri('google.com')
         );
     }
     
-    private function requestStringUriFactory() : Request
+    /**
+     * @depends testConstructor
+     * @param \Apine\Http\Request $request
+     */
+    public function testAddsHostHeader(Request $request)
     {
-        return new Request(
-          'GET',
-          'https://example.com'
-        );
-    }
-    
-    public function testAddsHostHeader()
-    {
-        $request = $this->requestFactory();
         $this->assertEquals('example.com', $request->getHeaderLine('Host'));
     }
     
-    public function testGetRequestTarget()
+    /**
+     * @depends testConstructor
+     * @param \Apine\Http\Request $request
+     */
+    public function testGetRequestTarget(Request $request)
     {
-        $this->assertEquals('/test/23?test=123', $this->requestFactory()->getRequestTarget());
+        $this->assertEquals('/test/23?test=123', $request->getRequestTarget());
     }
     
-    public function testWithRequestTarget()
+    /**
+     * @depends testConstructor
+     * @param \Apine\Http\Request $request
+     */
+    public function testWithRequestTarget(Request $request)
     {
-        $request = $this->requestFactory()->withRequestTarget('/giza?page=123');
+        $request = $request->withRequestTarget('/giza?page=123');
         $this->assertEquals('/giza?page=123', $request->getRequestTarget());
     }
     
     public function testGetRequestTargetEmpty()
     {
-        $request = $this->requestStringUriFactory();
+        $request = new Request(
+            'GET',
+            'https://example.com'
+        );
+        
         $this->assertEquals('/', $request->getRequestTarget());
     }
     
     /**
+     * @depends testConstructor
+     * @param \Apine\Http\Request $request
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Invalid target provided. Request targets may not contain whitespaces.
      */
-    public function testWithRequestTargetInvalid()
+    public function testWithRequestTargetInvalid(Request $request)
     {
-        $this->requestFactory()->withRequestTarget('/trest asdfas');
+        $request->withRequestTarget('/trest asdfas');
     }
     
-    public function testGetMethod()
+    /**
+     * @depends testConstructor
+     * @param \Apine\Http\Request $request
+     */
+    public function testGetMethod(Request $request)
     {
-        $this->assertEquals('GET', $this->requestFactory()->getMethod());
+        $this->assertEquals('GET', $request->getMethod());
     }
     
-    public function testWithMethod()
+    /**
+     * @depends testConstructor
+     * @param \Apine\Http\Request $request
+     */
+    public function testWithMethod(Request $request)
     {
-        $request = $this->requestFactory()->withMethod('POST');
+        $request = $request->withMethod('POST');
         $this->assertEquals('POST', $request->getMethod());
     }
     
-    public function testGetUri()
+    /**
+     * @depends testConstructor
+     * @param \Apine\Http\Request $request
+     */
+    public function testGetUri(Request $request)
     {
-        $uri = $this->requestFactory()->getUri();
+        $uri = $request->getUri();
         $this->assertInstanceOf(Uri::class, $uri);
         $this->assertEquals('example.com', $uri->getHost());
     }
     
-    public function testWithUri()
+    /**
+     * @depends testConstructor
+     * @param \Apine\Http\Request $request
+     */
+    public function testWithUri(Request $request)
     {
         $uri = new Uri('https://google.ca');
-        $request = $this->requestFactory()->withUri($uri);
+        $request = $request->withUri($uri);
         $this->assertInstanceOf(Uri::class, $request->getUri());
         $this->assertEquals($uri, $request->getUri());
     }
     
-    public function testGetServerParams()
+    /**
+     * @depends testConstructor
+     * @param \Apine\Http\Request $request
+     */
+    public function testGetServerParams(Request $request)
     {
-        $this->assertEquals($_SERVER, $this->requestFactory()->getServerParams());
+        $this->assertEquals([], $request->getServerParams());
     }
     
-    public function testGetCookieParams()
+    /**
+     * @depends testConstructor
+     * @param \Apine\Http\Request $request
+     */
+    public function testGetCookieParams(Request $request)
     {
-        $this->assertEquals([], $this->requestFactory()->getCookieParams());
+        $this->assertEquals([], $request->getCookieParams());
     }
     
-    public function testWithCookieParams()
+    /**
+     * @depends testConstructor
+     * @param \Apine\Http\Request $request
+     */
+    public function testWithCookieParams(Request $request)
     {
         $array = ['cookie' => 'value'];
-        $request = $this->requestFactory()->withCookieParams($array);
+        $request = $request->withCookieParams($array);
         
         $this->assertEquals($array, $request->getCookieParams());
     }
     
-    public function testGetQueryParams()
+    /**
+     * @depends testConstructor
+     * @param \Apine\Http\Request $request
+     */
+    public function testGetQueryParams(Request $request)
     {
-        $this->assertEquals(['test' => 123], $this->requestFactory()->getQueryParams());
+        $this->assertEquals(['test' => 123], $request->getQueryParams());
     }
     
-    public function testWithQueryParams()
+    /**
+     * @depends testConstructor
+     * @param \Apine\Http\Request $request
+     */
+    public function testWithQueryParams(Request $request)
     {
         $array = ['query' => 'test', 'test' => 5678];
-        $request = $this->requestFactory()->withQueryParams($array);
+        $request = $request->withQueryParams($array);
         $this->assertEquals($array, $request->getQueryParams());
     }
     
-    public function testGetUploadedFiles()
+    /**
+     * @depends testConstructor
+     * @param \Apine\Http\Request $request
+     */
+    public function testGetUploadedFiles(Request $request)
     {
-        $this->assertEquals([], $this->requestFactory()->getUploadedFiles());
+        $this->assertEquals([], $request->getUploadedFiles());
     }
     
-    public function testWithUploadedFiles()
+    /**
+     * @depends testConstructor
+     * @param \Apine\Http\Request $request
+     */
+    public function testWithUploadedFiles(Request $request)
     {
         $resource = fopen('php://memory', 'r+');
         fwrite($resource, 'test');
         $file = new UploadedFile($resource, 4, 0, 'text.txt', 'text/plain');
         
-        $request = $this->requestFactory()->withUploadedFiles([$file]);
+        $request = $request->withUploadedFiles([$file]);
         $this->assertEquals([$file], $request->getUploadedFiles());
     }
     
-    public function testGetParsedBody()
+    /**
+     * @depends testConstructor
+     * @param \Apine\Http\Request $request
+     */
+    public function testGetParsedBody(Request $request)
     {
-        $this->assertEquals(null, $this->requestFactory()->getParsedBody());
+        $this->assertEquals(null, $request->getParsedBody());
     }
     
     public function testGetParsedBodyJson()
@@ -166,16 +243,26 @@ class RequestTest extends TestCase
         $this->assertEquals($json_array, $request->getParsedBody());
     }
     
-    public function testWithParsedBody()
+    /**
+     * @depends testConstructor
+     * @param \Apine\Http\Request $request
+     */
+    public function testWithParsedBody(Request $request)
     {
         $array = ['one' => 1, 'two' => 2, 'three' => 3];
-        $request = $this->requestFactory()->withParsedBody($array);
+        $request = $request->withParsedBody($array);
         $this->assertEquals($array, $request->getParsedBody());
     }
     
-    public function testWithAttribute()
+    /**
+     * @depends testConstructor
+     * @param \Apine\Http\Request $request
+     *
+     * @return \Apine\Http\Request
+     */
+    public function testWithAttribute(Request $request)
     {
-        $request = $this->requestFactory()->withAttribute('name', 'value');
+        $request = $request->withAttribute('name', 'value');
         $this->assertAttributeEquals(['name' => 'value'], 'attributes', $request);
         
         return $request;
@@ -183,6 +270,7 @@ class RequestTest extends TestCase
     
     /**
      * @depends testWithAttribute
+     * @param \Apine\Http\Request $request
      */
     public function testGetAttributes(Request $request)
     {
@@ -192,6 +280,7 @@ class RequestTest extends TestCase
     
     /**
      * @depends testWithAttribute
+     * @param \Apine\Http\Request $request
      */
     public function testGetAttribute(Request $request)
     {
@@ -200,6 +289,7 @@ class RequestTest extends TestCase
     
     /**
      * @depends testWithAttribute
+     * @param \Apine\Http\Request $request
      */
     public function testGetAttributeNonExisting(Request $request)
     {
@@ -208,6 +298,7 @@ class RequestTest extends TestCase
     
     /**
      * @depends testWithAttribute
+     * @param \Apine\Http\Request $request
      */
     public function testGetAttributeNonExistingWithDefault(Request $request)
     {
@@ -216,6 +307,7 @@ class RequestTest extends TestCase
     
     /**
      * @depends testWithAttribute
+     * @param \Apine\Http\Request $request
      */
     public function testWithoutAttribute(Request $request)
     {
@@ -224,9 +316,13 @@ class RequestTest extends TestCase
         $this->assertArrayNotHasKey('name', $request->getAttributes());
     }
     
-    public function testIsHttps()
+    /**
+     * @depends testConstructor
+     * @param \Apine\Http\Request $request
+     */
+    public function testIsHttps(Request $request)
     {
-        $this->assertFalse($this->requestFactory()->isHttps());
+        $this->assertFalse($request->isHttps());
     
         $request = new Request(
             'GET',
@@ -236,34 +332,54 @@ class RequestTest extends TestCase
         $this->assertTrue($request->isHttps());
     }
     
-    public function testIsAjax()
+    /**
+     * @depends testConstructor
+     * @param \Apine\Http\Request $request
+     */
+    public function testIsAjax(Request $request)
     {
-        $this->assertFalse($this->requestFactory()->isAjax());
+        $this->assertFalse($request->isAjax());
         
-        $request = $this->requestFactory()->withHeader('X-Requested-With', 'XMLHttpRequest');
+        $request = $request->withHeader('X-Requested-With', 'XMLHttpRequest');
         $this->assertTrue($request->isAjax());
     }
     
-    public function testIsGet()
+    /**
+     * @depends testConstructor
+     * @param \Apine\Http\Request $request
+     */
+    public function testIsGet(Request $request)
     {
-        $this->assertTrue($this->requestFactory()->isGet());
+        $this->assertTrue($request->isGet());
     }
     
-    public function testIsPost()
+    /**
+     * @depends testConstructor
+     * @param \Apine\Http\Request $request
+     */
+    public function testIsPost(Request $request)
     {
-        $request = $this->requestFactory()->withMethod('POST');
+        $request = $request->withMethod('POST');
         $this->assertTrue($request->isPost());
     }
     
-    public function testIsPut()
+    /**
+     * @depends testConstructor
+     * @param \Apine\Http\Request $request
+     */
+    public function testIsPut(Request $request)
     {
-        $request = $this->requestFactory()->withMethod('PUT');
+        $request = $request->withMethod('PUT');
         $this->assertTrue($request->isPut());
     }
     
-    public function testIsDelete()
+    /**
+     * @depends testConstructor
+     * @param \Apine\Http\Request $request
+     */
+    public function testIsDelete(Request $request)
     {
-        $request = $this->requestFactory()->withMethod('DELETE');
+        $request = $request->withMethod('DELETE');
         $this->assertTrue($request->isDelete());
     }
 }

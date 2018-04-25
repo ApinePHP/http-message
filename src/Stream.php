@@ -266,11 +266,7 @@ class Stream implements StreamInterface
      */
     public function rewind()
     {
-        try {
-            $this->seek(0);
-        } catch (\RuntimeException $e) {
-            throw $e;
-        }
+        $this->seek(0);
     }
     
     /**

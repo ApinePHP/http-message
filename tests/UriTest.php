@@ -7,10 +7,10 @@
  */
 declare(strict_types=1);
 
+/** @noinspection PhpUnusedLocalVariableInspection */
 
 use Apine\Http\Uri;
 use PHPUnit\Framework\TestCase;
-use Psr\Http\Message\UriInterface;
 
 class UriTest extends TestCase
 {

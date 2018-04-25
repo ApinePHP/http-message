@@ -331,17 +331,10 @@ abstract class Message implements MessageInterface
             
             $sanitizedName = strtolower($header);
             
-            if (isset($this->headers[$sanitizedName])) {
-                $this->headers[$sanitizedName]['value'] = array_merge(
-                    $this->headers[$sanitizedName]['value'],
-                    $value
-                );
-            } else {
-                $this->headers[$sanitizedName] = [
+            $this->headers[$sanitizedName] = [
                     'name' => $header,
                     'value' => $value
-                ];
-            }
+            ];
         }
     }
 }

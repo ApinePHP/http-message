@@ -7,6 +7,8 @@
  */
 declare(strict_types=1);
 
+/** @noinspection PhpUnhandledExceptionInspection */
+/** @noinspection PhpUndefinedMethodInspection */
 
 use Apine\Http\Message;
 use Apine\Http\Stream;
@@ -22,6 +24,7 @@ class MessageTest extends TestCase
     
     public function setUp()
     {
+        /** @no-inspection */
         $this->object = $this->getMockForAbstractClass(Message::class);
     }
     
@@ -161,5 +164,12 @@ class MessageTest extends TestCase
     {
         $this->assertInstanceOf(StreamInterface::class, $message->getBody());
         $this->assertEquals('Test Body', (string)$message->getBody());
+    }
+    
+    public function testGetBodyWhenBodyNotSet()
+    {
+        $message = $this->getMockForAbstractClass(Message::class);
+        $this->assertInstanceOf(StreamInterface::class, $message->getBody());
+        $this->assertEmpty((string)$message->getBody());
     }
 }

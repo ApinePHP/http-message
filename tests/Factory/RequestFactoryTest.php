@@ -7,6 +7,8 @@
  */
 declare(strict_types=1);
 
+/** @noinspection PhpUnusedLocalVariableInspection */
+
 use Apine\Http\Factories\RequestFactory;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;

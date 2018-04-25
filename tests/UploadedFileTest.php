@@ -7,6 +7,7 @@
  */
 declare(strict_types=1);
 
+/** @noinspection PhpUnusedLocalVariableInspection */
 
 use Apine\Http\Stream;
 use Apine\Http\UploadedFile;
@@ -15,18 +16,6 @@ use PHPUnit\Framework\TestCase;
 class UploadedFileTest extends TestCase
 {
     static private $filename = './testUploadFile';
-    
-    public function setUp()
-    {
-        set_error_handler(function (int $errorNumber, string $errorString = '', string $errorFile = null, int $errorLine = null) {
-            throw new \ErrorException($errorString, $errorNumber, $errorNumber, $errorFile, $errorLine);
-        }, E_ALL);
-    }
-    
-    public function tearDown()
-    {
-        restore_error_handler();
-    }
     
     /**
      * @beforeClass
@@ -102,22 +91,6 @@ class UploadedFileTest extends TestCase
         return $uploadedFile;
     }
     
-    public function testConstructorFromSAPI() : UploadedFile
-    {
-        $uploadedFile = new UploadedFile(
-            self::$filename,
-            12,
-            0,
-            'uploaded.txt',
-            'text/plain',
-            true
-        );
-    
-        $this->assertAttributeEquals(true, 'sapi', $uploadedFile);
-        
-        return $uploadedFile;
-    }
-    
     /**
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Invalid resource provided
@@ -164,13 +137,10 @@ class UploadedFileTest extends TestCase
         );
     }
     
-    /**
-     * @depends testConstructor
-     * @param UploadedFile $uploadedFile
-     */
-    public function testGetStream(UploadedFile $uploadedFile)
+    public function testGetStream()
     {
-        $this->assertInstanceOf(Stream::class, $uploadedFile->getStream());
+        $this->assertInstanceOf(Stream::class, $this->testConstructor()->getStream());
+        $this->assertInstanceOf(Stream::class, $this->testConstructorFromStream()->getStream());
     }
     
     /**
@@ -194,8 +164,8 @@ class UploadedFileTest extends TestCase
      * @depends testConstructor
      * @param UploadedFile $uploadedFile
      *
-     * @expectedException \ErrorException
-     * @expectedExceptionMessageRegExp /No such file or directory/
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessageRegExp /File (.*)? could not be moved to (.*)?/
      */
     public function testMoveToCannotWrite(UploadedFile $uploadedFile)
     {

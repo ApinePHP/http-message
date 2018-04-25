@@ -31,16 +31,13 @@ class UploadedFile implements UploadedFileInterface
     private $error;
     
     private $moved = false;
-    
-    private $sapi = false;
 
     private $size;
     
-    public function __construct($resource, int $size, int $errorStatus = UPLOAD_ERR_OK, $clientFilename = null, $clientMediaType = null, $sapi = false)
+    public function __construct($resource, int $size, int $errorStatus = UPLOAD_ERR_OK, $clientFilename = null, $clientMediaType = null)
     {
         $this->size = $size;
         $this->error = $errorStatus;
-        $this->sapi = $sapi;
         $this->setClientFilename($clientFilename);
         $this->setClientMediaType($clientMediaType);
         
@@ -154,56 +151,26 @@ class UploadedFile implements UploadedFileInterface
             throw new \InvalidArgumentException("The specified path is invalid");
         }
         
-        /*try {
-            if ($this->file) {
-                $this->moved = (php_sapi_name() == 'cli')
-                    ? rename($this->file, $targetPath)
-                    : move_uploaded_file($this->file, $targetPath);
-            } else {
+        try {
+            if ($this->stream) {
                 $newfile = new Stream(fopen($targetPath, 'w'));
-        
+    
                 while (!$this->stream->eof()) {
                     if (!$newfile->write($this->stream->read(8192))) {
                         break;
                     }
                 }
-                
-                $this->moved = true;
-            }
-    
-            if (!$this->moved) {
-                throw new \RuntimeException(sprintf("File could not be moved to %s", $targetPath));
+            } else {
+                if (is_uploaded_file($this->file)) {
+                    move_uploaded_file($this->file, $targetPath);
+                } else {
+                    rename($this->file, $targetPath);
+                }
             }
         } catch (\Throwable $e) {
-            throw $e;
-        }*/
-        
-        if ($this->stream) {
-            try {
-                $newfile = new Stream(fopen($targetPath, 'w'));
-    
-                while (!$this->stream->eof()) {
-                    if (!$newfile->write($this->stream->read(8192))) {
-                        break;
-                    }
-                }
-            } catch (\Throwable $e) {
-                throw new \RuntimeException(sprintf("File %1s could not be moved to %2s", $this->file, $targetPath));
-            }
-        } else if ($this->sapi) {
-            if (!is_uploaded_file($this->file)) {
-                throw new \RuntimeException(sprintf('%s is not a valid uploaded file', $this->file));
-            }
-            
-            if(!move_uploaded_file($this->file, $targetPath)) {
-                throw new \RuntimeException(sprintf("File %1s could not be moved to %2s", $this->file, $targetPath));
-            }
-        } else {
-            if(!rename($this->file, $targetPath)) {
-                throw new \RuntimeException(sprintf("File %1s could not be moved to %2s", $this->file, $targetPath));
-            }
+            throw new \RuntimeException(sprintf("File %1s could not be moved to %2s", $this->file, $targetPath));
         }
-        
+    
         $this->moved = true;
     }
     
